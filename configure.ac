@@ -1,0 +1,7 @@
+AC_INIT([monoreg], 0.1)
+AC_CHECK_LIB([m],[cos],[PKG_LIBS="${PKG_LIBS} -lm"],[AC_MSG_ERROR([Cannot find Math Library.])])
+AC_CHECK_LIB([gslcblas],[cblas_dgemm],[PKG_LIBS="${PKG_LIBS} -lgslcblas"],[AC_MSG_ERROR([Cannot find Gnu Scientific Library.])])
+AC_CHECK_LIB([gsl],[gsl_blas_dgemm],[PKG_LIBS="${PKG_LIBS} -lgsl"],[AC_MSG_ERROR([Cannot find Gnu Scientific Library.])],[-lgslcblas])
+AC_CHECK_HEADER([gsl/gsl_version.h], ,[AC_MSG_ERROR([Cannot find GSL headers.])])
+AC_SUBST(PKG_LIBS)
+AC_OUTPUT(src/Makevars)
