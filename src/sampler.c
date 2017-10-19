@@ -23,13 +23,6 @@
 
 /* ************************************************************************** */
 
-void R_init_monoreg(DllInfo* info) {
-	R_registerRoutines(info, NULL, NULL, NULL, NULL);
-	R_useDynamicSymbols(info, TRUE);
-}
-
-/* ************************************************************************** */
-
 /* Global variables: */
 
 int NITER, BURNIN, ADAPT, REFRESH, THIN, NOBS, NCOV, NCOVC, NAXS, BIRTHDEATH, NPPS, NPKG, TIMEVAR, SEED, COMP, NOTIME, LOGIT, NODATA;
@@ -1367,3 +1360,17 @@ void sampler(int *iargs, double *dargs, int *idata, double *ddata,
 }
 
 /* ************************************************************************** */
+
+static const R_CMethodDef CEntries[] = {
+    {"sampler", (DL_FUNC) &sampler, 17},
+    {NULL, NULL, 0}
+};
+
+void R_init_monoreg(DllInfo *dll)
+{
+    R_registerRoutines(dll, CEntries, NULL, NULL, NULL);
+    R_useDynamicSymbols(dll, FALSE);
+}
+
+/* ************************************************************************** */
+

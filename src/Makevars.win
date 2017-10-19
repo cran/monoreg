@@ -1,1 +1,8 @@
-PKG_LIBS =  -lm -lgslcblas -lgsl
+# The following is copied from Makevars.win of package `gsl': 
+# lines below supplied by Brian Ripley and Uwe Ligges
+
+
+PKG_CPPFLAGS=-I$(LIB_GSL)/include
+
+PKG_LIBS=-L$(LIB_GSL)/lib -lgsl -lgslcblas
+
