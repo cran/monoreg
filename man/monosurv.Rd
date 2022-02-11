@@ -67,6 +67,7 @@ Saarela O., Arjas E. (2011). A method for Bayesian monotonic multiple regression
 Saarela O., Arjas E. (2015). Non-parametric Bayesian hazard regression for chronic disease risk assessment. Scandinavian Journal of Statistics, 42:609--626.
 }
 \examples{
+\dontrun{
 library(monoreg)
 set.seed(1)
 # nobs <- 1000
@@ -111,5 +112,6 @@ for (i in 1:nobs) {
 points(trans3d(x1[idx], x2[idx], pred[idx], tr), pch=21, bg='white')
 par(op)
 # dev.off()
+}
 }
 \author{Olli Saarela <olli.saarela@utoronto.ca>}

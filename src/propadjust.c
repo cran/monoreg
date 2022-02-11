@@ -34,7 +34,7 @@ void adjustproposal(long int *counter, double *sd, int iter, int adapt, double i
     if (counter[1] > 0 && iter <= adapt) {
         rate = (double)counter[0]/counter[1];
         weight = 1.0 - 2.0*(fabs(rate - 0.5));
-        if ((iter >= 1000) & (iter <= adapt)) {
+        if ((iter >= round(adapt/5)) & (iter <= adapt)) {
             sd[1] += weight * sd[0];
             sd[2] += weight;
         }
@@ -43,7 +43,7 @@ void adjustproposal(long int *counter, double *sd, int iter, int adapt, double i
         counter[1] = 0;
     }
     else if (counter[1] == 0 && iter <= adapt) {
-        if ((iter >= 1000) & (iter <= adapt)) {
+        if ((iter >= round(adapt/5)) & (iter <= adapt)) {
             sd[1] += 1.0 * init;
             sd[2] += 1.0;
         }

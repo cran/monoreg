@@ -21,20 +21,24 @@
 
 #define MAXTOTAL 10000
 
+extern void ordsampler(int *iargs, double *dargs, int *idata, double *ddata,
+					   int *isettozero, int *steptotalf, int *stepsf,
+					   double *rhof, double *likf, double *tauf, double *alphaf, double *betaf, double *lambdaf, double *sigmasqf);
+
 /* ************************************************************************** */
 
 /* Global variables: */
 
-int NITER, BURNIN, ADAPT, REFRESH, THIN, NOBS, NCOV, NCOVC, NAXS, BIRTHDEATH, NPPS, NPKG, TIMEVAR, SEED, COMP, NOTIME, LOGIT, NODATA;
+int NITER, BURNIN, ADAPT, REFRESH, THIN, NOBS, NCOV, NCOVC, NAXS, BIRTHDEATH, NPPS, NPKG, TIMEVAR, SEED, COMP, NOTIME, LOGIT, NODATA, steptotal;
 double RHOA, RHOB, YEARS, DELTAI, DRANGE, sigma;
 
-int steptotal;
 int *steps, *maxstep, *pp, *predict, *include, *d, *pps, *pkg, *cr;
 int **settozero;
 long int **betacnt, **betaccnt, **sigmacnt;
 
 double *sprob, *offset, *b, *smin, *smax, *vol, *y, *delta, *deltaold, *delta0, *delta0old, *deltamin, *deltamax,
 *deltaminold, *deltamaxold, *rho, *beta, *betac;
+
 double **z, **zc, **x, **bz, **bzold, **spos, **pred, **betasd, **betacsd, **sigmasd;
 double ***lambda, ***lambdaold;
 
@@ -46,7 +50,7 @@ gsl_ran_discrete_t *discd;
 /* ************************************************************************** */
 
 double loglik() {
-    int i, j;
+    int i, j, counter=0;
     double l=0.0;
     double mu[2];
     if (NODATA)
@@ -71,10 +75,11 @@ double loglik() {
                 for (j = 0; j < NPKG; j++)
                     mu[cr[j]] += (*lambda[j][i]);
                 l -= (y[i] - mu[0])*(y[i] - mu[0]);
+				counter++;
             }            
         }
         l /= (2.0*sigma*sigma);
-        l -= NOBS * log(sigma);
+        l -= counter * log(sigma);
     }
     return l;
 }
@@ -732,10 +737,17 @@ void getpred() {
         if (NOTIME) {
             for (i = 0; i < NOBS; i++) {
                 if (predict[i]) {
+                    for (j = 0; j < NPKG; j++)
+                        lambda[j][i] = &(delta0[j]);
+					for (k = 0; k < steptotal; k++) {
+						if (delta[k] > *lambda[pkg[pp[k]]][i])
+							if (lowercorner(i, k))
+								lambda[pkg[pp[k]]][i] = &(delta[k]);
+					}					
                     mu[0] = bz[0][i] + offset[i];
                     mu[1] = bz[1][i];
                     for (j = 0; j < NPKG; j++)
-                        mu[cr[j]] += (*lambda[j][i]);
+                        mu[cr[j]] += (*lambda[j][i]);					
                     pred[i][0] = exp(mu[0])/(1.0 + exp(mu[0]) + exp(mu[1]));
                     pred[i][1] = exp(mu[1])/(1.0 + exp(mu[0]) + exp(mu[1]));
                 }
@@ -839,7 +851,14 @@ void getpred() {
     }
     else {
         for (i = 0; i < NOBS; i++) {
-            if (predict[i]) {
+            if (predict[i]) {				
+				for (j = 0; j < NPKG; j++)
+					lambda[j][i] = &(delta0[j]);
+				for (k = 0; k < steptotal; k++) {
+					if (delta[k] > *lambda[pkg[pp[k]]][i])
+						if (lowercorner(i, k))
+							lambda[pkg[pp[k]]][i] = &(delta[k]);
+				}					
                 mu[0] = bz[0][i] + offset[i];
                 mu[1] = bz[1][i];
                 for (j = 0; j < NPKG; j++)
@@ -1363,6 +1382,7 @@ void sampler(int *iargs, double *dargs, int *idata, double *ddata,
 
 static const R_CMethodDef CEntries[] = {
     {"sampler", (DL_FUNC) &sampler, 17},
+    {"ordsampler", (DL_FUNC) &ordsampler, 14},	
     {NULL, NULL, 0}
 };
 
@@ -1373,4 +1393,3 @@ void R_init_monoreg(DllInfo *dll)
 }
 
 /* ************************************************************************** */
-

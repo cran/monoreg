@@ -1,4 +1,3 @@
-
 getcmat <- function(p) {
     cmat <- matrix(0, 2^p - 1, p)
     k <- 0
@@ -290,4 +289,144 @@ monosurv <- function(niter=15000, burnin=5000, adapt=5000, refresh=10, thin=5, b
                 'loglik'=results[[11]], 'beta'=matrix(results[[12]], nsave, ncov), 'betac'=matrix(results[[13]], nsave, ncovc),
                 'phi'=matrix(results[[14]], nsave * npkg, sum(predict) + 1), 'risk'=matrix(results[[15]], nsave, sum(predict)),
                 'crisk'=matrix(results[[16]], nsave, sum(predict))))
+}
+
+ordmonoreg <- function(niter=15000, burnin=5000, adapt=5000, refresh=10, thin=20, 
+                       birthdeath=1, logit=FALSE, gam=FALSE, seed=1, rhoa=0.1, rhob=0.1, 
+                       deltai=0.5, dlower=0, dupper=1, invprob=1.0, dc=0.0,
+                       predict, include, outcome, axes, covariates=NULL, 
+                       cluster=NULL, ncluster=NULL, settozero) {
+    nobs <- nrow(as.matrix(axes))
+    naxs <- ncol(as.matrix(axes))
+    {
+        if (!is.null(covariates)) {
+            if (!is.null(cluster))
+                covariates <- cbind(cluster, covariates)
+            else
+                covariates <- cbind(1, covariates)
+            ncov <- ncol(as.matrix(covariates))
+        }
+        else {
+            if (!is.null(cluster))
+                covariates <- cluster
+            else {
+                covariates <- rep(1, nobs)
+            }
+            ncov <- 1
+        }
+        if (is.null(cluster))
+            ncluster <- 1;    
+    }
+    settozero <- as.matrix(settozero)
+    npps <- nrow(settozero)
+    nsave <- (niter - burnin)/thin
+    ncat <- length(unique(outcome))
+    
+    {if (!is.logical(logit))
+        stop('Argument logit must be logical.')
+        else
+            logit <- as.integer(logit)
+    }
+    {if (logit == 1) {
+        if (!(length(dlower) == 1 & deltai < 0.0))
+            stop('Argument dlower must be a negative real value.')    
+        if (!(length(deltai) == 1 & deltai > 0.0))
+            stop('Argument dupper must be a positive real value.')    
+    }
+        else {
+            if (!(length(dlower) == 1 & dlower >= 0.0 & dlower <= 1.0))
+                stop('Argument dlower must be between zero and one.')    
+            if (!(length(dupper) == 1 & dupper >= 0.0 & dupper <= 1.0))
+                stop('Argument dupper must be between zero and one.')    
+        }}
+    if (dlower >= dupper)
+        stop('Argument dupper must be greater than dlower.')
+    if (!(length(invprob) == 1 & invprob >= 0.0 & invprob <= 1.0))
+        stop('Argument invprob must be between zero and one.')    
+    {if (!is.logical(gam))
+        stop('Argument gam must be logical.')
+        else
+            gam <- as.integer(gam)
+        }
+    nint <- 1
+    if (gam==1 & ncov > 1) {
+        for (i in 2:ncov)
+            nint <- ifelse(length(unique(covariates[,i])) > nint, length(unique(covariates[,i])), nint)
+    }
+    if (!(length(niter) == 1 & niter %% 1 == 0))
+        stop('Argument niter must be integer-valued.')
+    if (!(length(burnin) == 1 & burnin %% 1 == 0))
+        stop('Argument burnin must be integer-valued.')
+    if (!(length(adapt) == 1 & adapt %% 1 == 0))
+        stop('Argument adapt must be integer-valued.')
+    if (!(length(refresh) == 1 & refresh %% 1 == 0))
+        stop('Argument refresh must be integer-valued.')
+    if (!(length(thin) == 1 & thin %% 1 == 0))
+        stop('Argument thin must be integer-valued.')
+    if (!(length(birthdeath) == 1 & birthdeath %% 1 == 0))
+        stop('Argument birthdeath must be integer-valued.')
+    if (!(length(seed) == 1 & seed %% 1 == 0))
+        stop('Argument seed must be integer-valued.')
+    if (!(length(rhoa) == 1 & rhoa > 0.0))
+        stop('Argument rhoa must be a positive real value.')
+    if (!(length(rhob) == 1 & rhob > 0.0))
+        stop('Argument rhob must be a positive real value.')
+    if (!(length(deltai) == 1 & deltai > 0.0))
+        stop('Argument deltai must be a positive real value.')
+    if (!(length(dc) == 1 & dc >= 0.0))
+        stop('Argument dc must be a non-negative real value.')      
+    if (!identical(sort(union(as.integer(settozero), c(0,1))), c(0,1)))
+        stop('Argument settozero must involve a matrix of ones and zeros.')
+    if (naxs != ncol(settozero))
+        stop('Arguments settozero and axes do not match.')
+    if (!identical(sort(union(outcome, seq(1,ncat,1))), seq(1,ncat,1)))
+        stop('Argument outcome must only involve integer numbers')
+    if (!(nrow(as.matrix(predict)) == nrow(as.matrix(include)) & 
+          nrow(as.matrix(predict)) == nrow(as.matrix(outcome)) &
+          nrow(as.matrix(predict)) == nrow(as.matrix(axes)) &
+          nrow(as.matrix(predict)) == nrow(as.matrix(covariates))))
+        stop('Lengths of the data arguments do not match.')
+    if (min(axes) < 0 | max(axes) > 1)
+        stop('The variables in argument axes must be scaled into zero-one interval.')
+    if (nsave < 1 | nsave > niter)
+        stop('Number of interations to be saved is too small or too large.')
+    if (nsave %% 1 != 0)
+        stop('Number of interations to be saved is not integer-valued.')
+    if (niter <= burnin)
+        stop('Argument burnin must be smaller than argument niter.')
+    if (!identical(sort(union(include, c(0,1))), c(0,1)))
+        stop('Argument include must be a vector of ones and zeros.')
+    if (sum(include) == 0)
+        stop('Argument include must specify observations to be included in the likelihood.')
+    if (!identical(sort(union(predict, c(0,1))), c(0,1)))
+        stop('Argument predict must be a vector of ones and zeros.')
+    if (sum(predict) == 0)
+        stop('Argument predict must specify new observations for prediction.')
+    if (!is.null(cluster)) {
+        if(sum(sort(unique(cluster)) == seq(1:ncluster) - 1) != ncluster)
+            stop('Clusters must be numbered from 0 to ncluster-1.')
+    }
+    
+    results <- .C("ordsampler", 
+                  as.integer(c(niter, burnin, adapt, refresh, thin, nobs, ncov, naxs, birthdeath, npps, ncat, ncluster, logit, seed, gam)),
+                  as.double(c(rhoa, rhob, deltai, dlower, dupper, invprob, dc)),
+                  as.integer(cbind(predict, include, outcome-1)),
+                  as.double(cbind(axes, covariates)),
+                  as.integer(settozero),
+                  as.integer(numeric(nsave)),
+                  as.integer(numeric(nsave * npps)),
+                  numeric(nsave * npps),
+                  numeric(nsave),
+                  numeric(nsave),
+                  numeric(nsave * ncluster),
+                  numeric(nsave * ncov * nint),
+                  numeric(nsave * ncat * (sum(predict) + 1)),
+                  numeric(nsave * ncov),
+                  PACKAGE='monoreg')
+    
+    return(list('steptotal'=results[[6]], 'steps'=matrix(results[[7]], nsave, npps), 'rho'=matrix(results[[8]], nsave, npps),
+                'loglik'=results[[9]], 'tau'=results[[10]], 'alpha'=matrix(results[[11]], nsave, ncluster),
+                'beta'=array(results[[12]], c(nsave, ncov, nint)),
+                'lambda'=matrix(results[[13]], nsave * ncat, sum(predict) + 1),
+                'sigmasq'=matrix(results[[14]], nsave, ncov)))
 }

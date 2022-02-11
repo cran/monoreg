@@ -52,6 +52,7 @@ A list with elements
 Saarela O., Arjas E. (2011). A method for Bayesian monotonic multiple regression. Scandinavian Journal of Statistics, 38:499--513.
 }
 \examples{
+\dontrun{
 library(monoreg)
 set.seed(1)
 # nobs <- 1000
@@ -97,5 +98,6 @@ for (i in 1:nobs) {
 points(trans3d(x1[idx], x2[idx], pred[idx], tr), pch=21, bg='white')
 par(op)
 # dev.off()
+}
 }
 \author{Olli Saarela <olli.saarela@utoronto.ca>}

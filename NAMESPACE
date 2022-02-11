@@ -1,5 +1,5 @@
 useDynLib(monoreg, .registration = TRUE)
-export(getcmat, monoreg, monosurv)
+export(getcmat, monoreg, monosurv, ordmonoreg)
 importFrom("stats", "sd")
 importFrom("utils", "combn")
 
