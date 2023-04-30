@@ -1,4 +1,4 @@
-1d0121f0033683ffa74f322740a4592f *DESCRIPTION
+d14ec517c8190e5fcc0d78ab026717cc *DESCRIPTION
 d16bf57aa36113afefeae172d5bea59e *NAMESPACE
 3c8f2669e4e1a2971d76a6e1b7f690c0 *R/monoreg.R
 8b6a463b99bbc166f437a5fd42f98309 *R/zzz.R
@@ -9,13 +9,13 @@ c3cded853a2388ad53569a7105d1c1e3 *cleanup
 a9dcbf1296409dc6200e0f47add86255 *man/getcmat.Rd
 4f7f663102bdde3aac59f041aec54e48 *man/monoreg.Rd
 da56a1b2dbf68c6156cf5a5a7b962ae4 *man/monosurv.Rd
-59f1655748b3b53f31c817ce370034f6 *man/ordmonoreg.Rd
+b0f0a27c5977e25121985682f5d2d272 *man/ordmonoreg.Rd
 67df4406f7d0818e64227cb07c5ac269 *man/risks.Rd
 d1f804b66140f2910d99cb60839cad8c *src/Makevars.in
 527697a7779372c7fffbe3e06f7eb436 *src/Makevars.win
 f596dc66d00621af8330d1b42d5e75aa *src/mylib.c
 736986d7b9448453aa437aa76499aac5 *src/mylib.h
-c008e8c5671b1effcb713db345bcc4ba *src/ordsampler.c
+426d99dc27307427497f192df2975a21 *src/ordsampler.c
 c0460e6d235751e8c855a80650f821d7 *src/propadjust.c
 b9af010ed2f903c84ddbc1054e7d81e3 *src/propadjust.h
-8db1631623c53a144bba25c5ffc53fcc *src/sampler.c
+a898515e71a042cab017f6afa5c038b2 *src/sampler.c

@@ -3,7 +3,7 @@
 \title{Bayesian monotonic regression}
 \description{
 This function implements the non-parametric Bayesian monotonic regression procedure for 
-ordinal outcomes described in Saarela, Rohrbeck & Arjas (2022). 
+ordinal outcomes described in Saarela, Rohrbeck & Arjas (2023). 
 }
 \usage{
 
@@ -55,14 +55,15 @@ A list with elements
 \item{sigmasq}{A sample of autoregressive prior variances.}
 }
 \references{
-Saarela O., Rohrbeck C., Arjas E. (2022). Bayesian non-parametric ordinal regression under a monotonicity constraint. Bayesian Analysis, accepted for publication. arXiv:2007.01390
+Saarela O., Rohrbeck C., Arjas E. (2023). Bayesian non-parametric ordinal regression under a monotonicity constraint. Bayesian Analysis, 18:193--221.
 }
 \examples{
 library(monoreg)
 expit <- function(x) {1/(1+exp(-x))}
 logit <- function(p) {log(p)-log(1-p)}
 set.seed(1)
-nobs <- 500
+# nobs <- 500
+nobs <- 200
 x <- sort(runif(nobs))
 ngrid <- 100
 xgrid <- seq(1/ngrid, (ngrid-1)/ngrid, by=1/ngrid)

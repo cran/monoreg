@@ -49,7 +49,7 @@ gsl_ran_discrete_t *discd;
 
 /* ************************************************************************** */
 
-double loglik() {
+double loglik(void) {
     int i, j, counter=0;
     double l=0.0;
     double mu[2];
@@ -146,7 +146,7 @@ double sumtozero(int package) {
 
 /* ************************************************************************** */
 
-void savestate() {
+void savestate(void) {
     memcpy(deltaminold, deltamin, NPKG * sizeof(double));    
     memcpy(deltamaxold, deltamax, NPKG * sizeof(double));
     memcpy(deltaold, delta, steptotal * sizeof(double));
@@ -155,7 +155,7 @@ void savestate() {
 
 /* ************************************************************************** */
 
-void restorestate() {
+void restorestate(void) {
     memcpy(deltamin, deltaminold, NPKG * sizeof(double));    
     memcpy(deltamax, deltamaxold, NPKG * sizeof(double));
     memcpy(delta, deltaold, steptotal * sizeof(double));
@@ -726,7 +726,7 @@ int death_birth(int pid) {
 
 /* ************************************************************************** */
 
-void getpred() {
+void getpred(void) {
     int i, j, k, l;
     double tlower, tupper, surv, bsurv, predsum=0.0;
     double hr[2], mu[2], ch[2];

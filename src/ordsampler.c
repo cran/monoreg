@@ -56,7 +56,7 @@ extern gsl_ran_discrete_t *discd;
 
 /* ************************************************************************** */
 
-double ordloglik() {
+double ordloglik(void) {
     int i;
     double l=0.0;
 	if (LOGIT) {
@@ -110,7 +110,7 @@ double ordloglikcat(int j) {
 
 /* ************************************************************************** */
 
-void ordsavestate() {
+void ordsavestate(void) {
     int level;
     memcpy(deltaminold, deltamin, NCAT * sizeof(double));    
     memcpy(deltamaxold, deltamax, NCAT * sizeof(double));
@@ -121,7 +121,7 @@ void ordsavestate() {
 
 /* ************************************************************************** */
 
-void ordrestorestate() {
+void ordrestorestate(void) {
     int level;
     memcpy(deltamin, deltaminold, NCAT * sizeof(double));    
     memcpy(deltamax, deltamaxold, NCAT * sizeof(double));
@@ -383,7 +383,7 @@ int ordupdate_delta0(int level) {
 
 /* ************************************************************************** */
 
-int ordupdate_delta0_joint() {
+int ordupdate_delta0_joint(void) {
 
     /* Update delta0 jointly (random walk/prior proposal Metropolis): */
 
@@ -541,7 +541,7 @@ int ordupdate_alpha(int j, double sd) {
 
 /* ************************************************************************** */
 
-void ordupdate_tau() {
+void ordupdate_tau(void) {
 
     /* Update tau (conjugate inverse gamma): */
 
@@ -557,7 +557,7 @@ void ordupdate_tau() {
 
 /* ************************************************************************** */
 
-void ordupdate_dimtotals() {
+void ordupdate_dimtotals(void) {
 	int i, j;
 
     for (i = 0; i < NAXS; i++) {
@@ -707,7 +707,7 @@ void ordkill(int j) {
 
 /* ************************************************************************** */
 
-void ordgc() {
+void ordgc(void) {
 	int i, j, sum=0, total=steptotal;
 	int *count;
     count = ivector(MAXTOTAL);
@@ -1099,7 +1099,7 @@ int orddeath_birth(int pid) {
 
 /* ************************************************************************** */
 
-int ordcheckpartialordering() {
+int ordcheckpartialordering(void) {
     int i, j, k, level;
     for (level = 0; level < NCAT; level++) {
         for (i = 0; i < steptotal; i++) {
